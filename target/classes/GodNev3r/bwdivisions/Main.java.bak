@@ -1,0 +1,220 @@
+package GodNev3r.bwdivisions;
+
+import GodNev3r.bwdivisions.command.DivisionCommand;
+import GodNev3r.bwdivisions.command.DivisioneCommand;
+import GodNev3r.bwdivisions.config.ConfigManager;
+import GodNev3r.bwdivisions.economy.EconomyManager;
+import GodNev3r.bwdivisions.gui.DivisionGUI;
+import GodNev3r.bwdivisions.listener.DivisionChangeListener;
+import GodNev3r.bwdivisions.listener.TabListListener;
+import GodNev3r.bwdivisions.rewards.RewardManager;
+import GodNev3r.bwdivisions.stats.StatisticsManager;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
+
+/**
+ * Plugin principale per il sistema di progressione BW-Divisions
+ */
+public class Main extends JavaPlugin {
+    private DivisionManager divisionManager;
+    private ConfigManager configManager;
+    private DivisionTierManager tierManager;
+    private ProgressManager progressManager;
+    private EconomyManager economyManager;
+    private StatisticsManager statisticsManager;
+    private RewardManager rewardManager;
+    private DivisionGUI divisionGUI;
+    private DivisionCommand divisionCommand;
+    private DivisioneCommand divisioneCommand;
+    private DivisionExpansion expansion;
+    private TabListListener tabListListener;
+    private DivisionChangeListener divisionChangeListener;
+
+    @Override
+    public void onEnable() {
+        getLogger().info("Abilitazione BW-Divisions...");
+
+        // Inizializza il DivisionManager con delay di 40 tick per permettere il caricamento delle API
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            divisionManager = new DivisionManager(this);
+            divisionManager.initialize();
+
+            if (!divisionManager.isInitialized()) {
+                getLogger().warning("Nessuna API BedWars rilevata dopo il delay! Il plugin potrebbe non funzionare.");
+                return;
+            }
+
+            // Inizializza il ConfigManager dopo che DivisionManager è pronto
+            configManager = new ConfigManager(this, divisionManager);
+            configManager.initialize();
+            getLogger().info("ConfigManager inizializzato!");
+
+            // Inizializza il DivisionTierManager dopo che ConfigManager è pronto
+            tierManager = new DivisionTierManager(configManager);
+            divisionManager.setTierManager(tierManager);
+            getLogger().info("DivisionTierManager inizializzato!");
+
+            // Inizializza il ProgressManager
+            progressManager = new ProgressManager(divisionManager, tierManager);
+            getLogger().info("ProgressManager inizializzato!");
+
+            // Inizializza l'EconomyManager dopo che DivisionManager è pronto
+            economyManager = new EconomyManager(this, divisionManager);
+            economyManager.initialize();
+            getLogger().info("EconomyManager inizializzato!");
+
+            // Inizializza StatisticsManager
+            statisticsManager = new StatisticsManager(this, configManager);
+            statisticsManager.initialize();
+            getLogger().info("StatisticsManager inizializzato!");
+
+            // Inizializza RewardManager
+            rewardManager = new RewardManager(this, configManager);
+            getLogger().info("RewardManager inizializzato!");
+
+            // Inizializza DivisionGUI
+            divisionGUI = new DivisionGUI(this, divisionManager, configManager);
+            getLogger().info("DivisionGUI inizializzato!");
+
+            // Registra i comandi
+            String mainCommand = configManager.getConfig().getString("commands.main-command", "bwdiv");
+            divisionCommand = new DivisionCommand(this, configManager, divisionGUI, statisticsManager);
+            getCommand(mainCommand).setExecutor(divisionCommand);
+            getCommand(mainCommand).setTabCompleter(divisionCommand);
+            
+            // Registra il comando divisione
+            divisioneCommand = new DivisioneCommand(this, configManager, divisionManager);
+            getCommand("divisione").setExecutor(divisioneCommand);
+            getCommand("divisione").setTabCompleter(divisioneCommand);
+            
+            getLogger().info("Comandi registrati!");
+
+            // Registra PlaceholderAPI expansion se disponibile
+            /*
+            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                expansion = new DivisionExpansion(this, divisionManager, economyManager, progressManager);
+                if (expansion.register()) {
+                    getLogger().info("PlaceholderAPI expansion registrata con successo!");
+                } else {
+                    getLogger().warning("Impossibile registrare PlaceholderAPI expansion!");
+                }
+            } else {
+                getLogger().warning("PlaceholderAPI non trovato! Le placeholders non saranno disponibili.");
+            }
+            */
+
+            // Registra il listener per il TAB list
+            tabListListener = new TabListListener(this, divisionManager);
+            Bukkit.getPluginManager().registerEvents(tabListListener, this);
+            
+            // Registra il listener per i cambiamenti di divisione
+            divisionChangeListener = new DivisionChangeListener(this, divisionManager, configManager,
+                rewardManager, statisticsManager);
+            Bukkit.getPluginManager().registerEvents(divisionChangeListener, this);
+            
+            // Avvia l'aggiornamento periodico del TAB list
+            tabListListener.startPeriodicUpdate();
+            
+            // Avvia il controllo periodico dei cambiamenti di divisione
+            startDivisionCheckTask();
+            
+            // Aggiorna il TAB per tutti i giocatori già online
+            Bukkit.getScheduler().runTaskLater(this, () -> {
+                if (tabListListener != null) {
+                    tabListListener.updateTabListForAll();
+                }
+            }, 60L); // Delay di 3 secondi per permettere il caricamento completo
+
+            getLogger().info("BW-Divisions abilitato con successo!");
+        }, 40L); // Delay di 40 tick
+    }
+
+    @Override
+    public void onDisable() {
+        if (expansion != null) {
+            expansion.unregister();
+        }
+        if (economyManager != null) {
+            economyManager.onDisable();
+        }
+        if (statisticsManager != null) {
+            statisticsManager.onDisable();
+        }
+        getLogger().info("BW-Divisions disabilitato.");
+    }
+
+    /**
+     * Ottiene l'istanza del DivisionManager
+     * @return Il DivisionManager
+     */
+    public DivisionManager getDivisionManager() {
+        return divisionManager;
+    }
+
+    /**
+     * Ottiene l'istanza del TabListListener
+     * @return Il TabListListener
+     */
+    public TabListListener getTabListListener() {
+        return tabListListener;
+    }
+
+    /**
+     * Ottiene l'istanza dell'EconomyManager
+     * @return L'EconomyManager
+     */
+    public EconomyManager getEconomyManager() {
+        return economyManager;
+    }
+
+    /**
+     * Ottiene l'istanza del ConfigManager
+     * @return Il ConfigManager
+     */
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    /**
+     * Ottiene l'istanza del DivisionTierManager
+     * @return Il DivisionTierManager
+     */
+    public DivisionTierManager getTierManager() {
+        return tierManager;
+    }
+
+    /**
+     * Ottiene l'istanza del ProgressManager
+     * @return Il ProgressManager
+     */
+    public ProgressManager getProgressManager() {
+        return progressManager;
+    }
+
+    /**
+     * Avvia il task periodico per controllare i cambiamenti di divisione
+     */
+    private void startDivisionCheckTask() {
+        int checkInterval = configManager.getConfig().getInt("divisions.check-interval", 10);
+        long ticks = checkInterval * 20L; // Converti secondi in tick
+        
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            if (divisionChangeListener != null) {
+                divisionChangeListener.checkAllPlayers();
+            }
+        }, ticks, ticks);
+    }
+
+    /**
+     * Ricarica la configurazione e le divisioni
+     */
+    public void reload() {
+        if (configManager != null) {
+            configManager.reloadConfig();
+        }
+        if (tierManager != null) {
+            tierManager.reload();
+        }
+        getLogger().info("Configurazione ricaricata!");
+    }
+}

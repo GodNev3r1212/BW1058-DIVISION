@@ -1,0 +1,258 @@
+# Configurazione BW-Divisions
+# Questo file viene salvato automaticamente nella cartella addon del plugin BedWars appropriato
+# TUTTO è configurabile da qui senza modificare il codice!
+
+economy:
+  # Abilita il sistema di economia
+  enabled: true
+  # Saldo iniziale per i nuovi giocatori
+  starting-balance: 0.0
+
+divisions:
+  # Intervallo di aggiornamento del TAB list (in secondi)
+  update-interval: 30
+  # Intervallo di controllo per i cambiamenti di divisione (in secondi)
+  check-interval: 10
+  # Abilita il sistema di ricompense per le divisioni
+  rewards-enabled: true
+  # Abilita le statistiche avanzate
+  statistics-enabled: true
+  # Abilita il leaderboard
+  leaderboard-enabled: true
+  # Numero di giocatori da mostrare nel leaderboard
+  leaderboard-size: 10
+  # Abilita la GUI delle divisioni
+  gui-enabled: true
+  # Titolo della GUI delle divisioni
+  gui-title: "§8§lDivisioni"
+  # Dimensione della GUI (deve essere multiplo di 9, max 54)
+  gui-size: 54
+
+messages:
+  # Messaggio quando un giocatore sale di divisione
+  division-up: "§a§l[BW-Divisions] §7Sei salito di divisione a §f%new_division%"
+  # Messaggio quando un giocatore scende di divisione
+  division-down: "§c§l[BW-Divisions] §7Sei sceso di divisione da §f%old_division% §7a §f%new_division%"
+  # Abilita broadcast quando un giocatore sale di divisione
+  broadcast-division-up: false
+  # Abilita broadcast quando un giocatore scende di divisione
+  broadcast-division-down: false
+  # Messaggio broadcast quando sale (se abilitato)
+  division-up-broadcast: "§a§l[BW-Divisions] §7%player% è salito di divisione a §f%new_division%"
+  # Messaggio broadcast quando scende (se abilitato)
+  division-down-broadcast: "§c§l[BW-Divisions] §7%player% è sceso di divisione da §f%old_division% §7a §f%new_division%"
+  # Messaggio quando si riceve una ricompensa
+  reward-received: "§a§l[BW-Divisions] §7Hai ricevuto una ricompensa per aver raggiunto §f%division%"
+  # Messaggio quando si visualizzano le statistiche
+  stats-header: "§8§m----------§r §6§lStatistiche Divisioni §8§m----------"
+  # Messaggio quando si apre la GUI
+  gui-opened: "§aGUI delle divisioni aperta!"
+  # Messaggio quando non si hanno permessi
+  no-permission: "§cNon hai il permesso per eseguire questo comando!"
+  # Messaggio quando si usa un comando sbagliato
+  invalid-command: "§cComando non valido! Usa /bwdiv help"
+  # Messaggio di help
+  help-header: "§8§m----------§r §6§lBW-Divisions Help §8§m----------"
+  help-commands:
+    - "§7/bwdiv stats §8- §fVisualizza le tue statistiche"
+    - "§7/bwdiv gui §8- §fApri la GUI delle divisioni"
+    - "§7/bwdiv leaderboard §8- §fVisualizza la classifica"
+    - "§7/bwdiv reload §8- §fRicarica la configurazione (admin)"
+
+# Configurazione delle divisioni
+# Puoi modificare nome, colore, range di livelli e ricompense per ogni divisione
+tiers:
+  recluta:
+    name: "Recluta"
+    color: "§8"
+    min-level: 1
+    max-level: 14
+    # Ricompense quando si raggiunge questa divisione (lista di comandi)
+    rewards:
+      - "give %player% minecraft:gold_ingot 5"
+      - "eco give %player% 100"
+    # Messaggio personalizzato quando si raggiunge questa divisione (opzionale, lascia vuoto per usare quello generale)
+    custom-message: ""
+  soldato:
+    name: "Soldato"
+    color: "§f"
+    min-level: 15
+    max-level: 29
+    rewards:
+      - "give %player% minecraft:gold_ingot 10"
+      - "eco give %player% 250"
+    custom-message: ""
+  veterano:
+    name: "Veterano"
+    color: "§a"
+    min-level: 30
+    max-level: 49
+    rewards:
+      - "give %player% minecraft:diamond 5"
+      - "eco give %player% 500"
+    custom-message: ""
+  elite:
+    name: "Elite"
+    color: "§3"
+    min-level: 50
+    max-level: 74
+    rewards:
+      - "give %player% minecraft:diamond 10"
+      - "eco give %player% 1000"
+    custom-message: ""
+  maestro:
+    name: "Maestro"
+    color: "§d"
+    min-level: 75
+    max-level: 99
+    rewards:
+      - "give %player% minecraft:emerald 5"
+      - "eco give %player% 2500"
+    custom-message: ""
+  supremo:
+    name: "Supremo"
+    color: "§e"
+    min-level: 100
+    max-level: 2147483647
+    rewards:
+      - "give %player% minecraft:emerald 10"
+      - "eco give %player% 5000"
+    custom-message: ""
+
+# Configurazione GUI
+gui:
+  # Item per ogni divisione nella GUI
+  items:
+    recluta:
+      material: "COAL"
+      name: "§8§lRecluta"
+      lore:
+        - "§7Livelli: §f1-14"
+        - "§7Colore: §8Grigio"
+        - ""
+        - "§7Premi per raggiungere:"
+        - "§7- 5 Gold Ingot"
+        - "§7- 100 Coins"
+      slot: 10
+    soldato:
+      material: "IRON_INGOT"
+      name: "§f§lSoldato"
+      lore:
+        - "§7Livelli: §f15-29"
+        - "§7Colore: §fBianco"
+        - ""
+        - "§7Premi per raggiungere:"
+        - "§7- 10 Gold Ingot"
+        - "§7- 250 Coins"
+      slot: 12
+    veterano:
+      material: "GOLD_INGOT"
+      name: "§a§lVeterano"
+      lore:
+        - "§7Livelli: §f30-49"
+        - "§7Colore: §aVerde"
+        - ""
+        - "§7Premi per raggiungere:"
+        - "§7- 5 Diamond"
+        - "§7- 500 Coins"
+      slot: 14
+    elite:
+      material: "DIAMOND"
+      name: "§3§lElite"
+      lore:
+        - "§7Livelli: §f50-74"
+        - "§7Colore: §3Azzurro"
+        - ""
+        - "§7Premi per raggiungere:"
+        - "§7- 10 Diamond"
+        - "§7- 1000 Coins"
+      slot: 16
+    maestro:
+      material: "EMERALD"
+      name: "§d§lMaestro"
+      lore:
+        - "§7Livelli: §f75-99"
+        - "§7Colore: §dRosa"
+        - ""
+        - "§7Premi per raggiungere:"
+        - "§7- 5 Emerald"
+        - "§7- 2500 Coins"
+      slot: 28
+    supremo:
+      material: "NETHER_STAR"
+      name: "§e§lSupremo"
+      lore:
+        - "§7Livelli: §f100+"
+        - "§7Colore: §eGiallo"
+        - ""
+        - "§7Premi per raggiungere:"
+        - "§7- 10 Emerald"
+        - "§7- 5000 Coins"
+      slot: 34
+
+# Configurazione statistiche
+statistics:
+  # Abilita il tracciamento delle statistiche
+  enabled: true
+  # Traccia le vittorie
+  track-wins: true
+  # Traccia le sconfitte
+  track-losses: true
+  # Traccia la winstreak
+  track-winstreak: true
+  # Traccia la migliore divisione raggiunta
+  track-best-division: true
+  # Traccia il tempo totale giocato
+  track-playtime: true
+
+# Configurazione comandi
+commands:
+  # Comando principale
+  main-command: "bwdiv"
+  # Alias del comando principale
+  aliases:
+    - "bwdivisions"
+    - "divisions"
+  # Permessi
+  permissions:
+    stats: "bwdiv.stats"
+    gui: "bwdiv.gui"
+    leaderboard: "bwdiv.leaderboard"
+    reload: "bwdiv.reload"
+    admin: "bwdiv.admin"
+
+# Configurazione leaderboard
+leaderboard:
+  # Abilita il leaderboard
+  enabled: true
+  # Tipo di leaderboard (level, division, wins, winstreak)
+  type: "level"
+  # Numero di giocatori da mostrare
+  size: 10
+  # Formato del leaderboard
+  format:
+    header: "§8§m----------§r §6§lTop %size% Giocatori §8§m----------"
+    entry: "§7%position%. §f%player% §7- §f%value%"
+    footer: "§8§m--------------------------------"
+
+# Configurazione placeholders
+placeholders:
+  # Formato del prefisso (per PlaceholderAPI)
+  prefix-format: "§7[§%color%%level%§7]"
+  # Formato del nome divisione
+  name-format: "%color%%name%"
+  # Formato del progresso
+  progress-format: "%progress%%"
+  # Formato dei livelli rimanenti
+  levels-format: "%levels% livelli"
+
+# Configurazione avanzata
+advanced:
+  # Abilita il debug mode
+  debug: false
+  # Salva i dati ogni X secondi (0 per disabilitare il salvataggio automatico)
+  auto-save-interval: 300
+  # Usa cache per le query dei livelli (migliora le performance)
+  use-cache: true
+  # Tempo di cache in secondi
+  cache-time: 30

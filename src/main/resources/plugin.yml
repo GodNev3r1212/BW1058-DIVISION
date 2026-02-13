@@ -1,0 +1,11 @@
+name: BW-Divisions
+version: 1.0.0
+main: GodNev3r.bwdivisions.MainSimple
+api-version: 1.13
+author: GodNev3r
+description: Sistema di progressione per BedWars (Simple Version)
+commands:
+  divisione:
+    description: Comando per gestire le divisioni
+    usage: /<command> [give|top|help]
+    aliases: [d]
